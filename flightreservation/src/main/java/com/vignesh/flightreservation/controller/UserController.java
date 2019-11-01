@@ -1,6 +1,7 @@
 package com.vignesh.flightreservation.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -9,12 +10,19 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.vignesh.flightreservation.model.User;
 import com.vignesh.flightreservation.repos.UserRepository;
+import com.vignesh.flightreservation.service.SecurityService;
 
 @Controller
 public class UserController {
 	
 	@Autowired
 	UserRepository userRepository;
+	
+	@Autowired
+	BCryptPasswordEncoder BCryptPasswordEncoder;
+	
+	@Autowired
+	SecurityService securityService;
 	
 	@RequestMapping("/showReg")
 	public String showRegistration() {
@@ -23,6 +31,7 @@ public class UserController {
 	
 	@RequestMapping(value="registerUser", method=RequestMethod.GET)
 	public String registerUser(@ModelAttribute("user") User user) {
+		user.setPassword(BCryptPasswordEncoder.encode(user.getPassword()));
 		userRepository.save(user);
 		return "login/login";
 	}
@@ -30,7 +39,9 @@ public class UserController {
 	@RequestMapping(value="login", method = RequestMethod.POST)
 	public String login(@ModelAttribute("email") String email, @ModelAttribute("password") String password, ModelMap modelMap) {
 		User user = userRepository.findByEmail(email);
-		if (user.getPassword().equals(password)) {
+		
+		boolean loginResult = securityService.login(email, password);
+		if (loginResult) {
 			return "findFlights";
 		} else {
 			modelMap.addAttribute("msg", "Invalid username or password provided for login");

@@ -1,5 +1,7 @@
 package com.vignesh.flightreservation.service;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +28,7 @@ public class ReservationServiceImpl implements ReservationService{
 	ReservationRepository ReservationRepository;
 
 	@Override
+	@Transactional
 	public Reservation bookFlight(ReservationRequest reservationRequest) {
 		
 		Flight flight = flightRepository.findById(reservationRequest.getFlightID()).orElse(null);

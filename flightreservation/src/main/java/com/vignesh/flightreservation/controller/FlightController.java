@@ -28,5 +28,10 @@ public class FlightController {
 		modelMap.addAttribute("msg", "Here are the results for your flights search");
 		return "displayFlights";
 	}
+	
+	@RequestMapping(value="admin/addFlight", method=RequestMethod.GET)
+	public String addFlight() {
+		return "addFlight";
+	}
 
 }
